@@ -1,5 +1,5 @@
 function [b, intercept] = PQSQRegression(X, Y, varargin)
-%lassoPQSQ calculates PQSQ approximation for lasso regression.
+%PQSQRegression calculates PQSQ approximation for lasso regression.
 %Syntax
 %   [b, intercept] = PQSQRegression(X, Y)
 %   [b, intercept] = PQSQRegression(X, Y, Name, Value)
