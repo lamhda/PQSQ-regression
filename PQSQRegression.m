@@ -29,20 +29,19 @@ function [b, intercept] = PQSQRegression(X, Y, varargin)
 %           least two values must be positive. (default (1/N)*ones(N,1)). 
 %
 %Return values:
-%   B is the fitted coefficients for each model. B will have dimension PxL,
-%       where P = size(X,2) is the number of predictors, and 
-%       L =  length(lambda). 
-
-
+%   b is vector of the fitted coefficients for model. b have dimension Px1,
+%       where P = size(X,2) is the number of predictors
+%   intercept is intercept of model.
 
     %Sanity-check of X and Y
     %X must be real valued matrix without Infs and NaNs
     if ~isreal(X) || ~all(isfinite(X(:))) || isscalar(X) || length(size(X))~=2
-        error('Incorrect value for argument "X". It must be real valued matrix without Infs and NaNs');
+        error(['Incorrect value for argument "X".'...
+            ' It must be real valued matrix without Infs and NaNs']);
     end
     
-    %Define dimensions
-    [n, m] = size(X);
+    %Define number of predictors
+    n = size(X, 1);
     
     %Y must be real valued vector without Infs and NaNs and with number of
     %elements equals to n
@@ -85,7 +84,8 @@ function [b, intercept] = PQSQRegression(X, Y, varargin)
         %Weights must be a vector of nonnegative finite reals with at least two
         %values greater than zero and with number of elements equal to number
         %of rows in X. 
-        if ~isreal(weights) || ~isfinite(weights) || sum(weights<0)>0 || sum(weights>0)<2 || numel(weights)~=n
+        if ~isreal(weights) || ~isfinite(weights) || sum(weights<0)>0 ||...
+                sum(weights>0)<2 || numel(weights)~=n
             error(['Incorrect value for argument "Weights". It must be ',...
                 'a vector of nonnegative finite reals with at least two',...
                 'values greater than zero and with number of elements equal',...
@@ -102,7 +102,8 @@ function [b, intercept] = PQSQRegression(X, Y, varargin)
     
     %Func must be function handler
     if ~isa(func,'function_handle')
-        error('Incorrect value in "potential" argument. It must be function handler');
+        error(['Incorrect value in "potential" argument.'...
+            ' It must be function handler']);
     end
     
     %Solve OLS to obtain information for deviations
@@ -142,13 +143,12 @@ function [b, intercept] = PQSQRegression(X, Y, varargin)
     end
     
     %Main loop
-    q = repmat(1,n,1);
+    q = ones(n,1);
     while true
         %Store old values of indeices
         qOld = q;
         %Calculate new deviation absolute values
         d = abs(Y-X*b);
-        [sum(d), sum(d.^2), sum( pFunc.A(q) .* d'.^2+ pFunc.B(q))]
         %Calculate new indices
         q = discretize(d,pFunc.intervals);
         %Check convexity
@@ -166,50 +166,8 @@ function [b, intercept] = PQSQRegression(X, Y, varargin)
     b = b(1:end-1);
 end
 
-% function b = fitModel(M, R, lambda, alpha, b, pFunc, eps)
-% %fitModel fits model for specified lambda.
-% %Inputs
-% %   M is matrix X'*X, where X is data matrix (with weights)
-% %   R is vector of right hand side of SLAE
-% %`  lambda is specified value of lambda
-% %   alpha is elastic net mixing value
-% %   b is original values of regression coefficients
-% %   pFunc is PQSQ potential function structure
-% %Returns
-% %   fitted regression coefficients.
-%     
-%     %Get size
-%     L = size(b,1);
-%     %Form muliindeces from 'previous' step
-%     qOld = repmat(-1,L,1);
-%     indOld = abs(b)<eps;
-% 
-%     %Main loop of fitting
-%     while true
-%         %Form new multiindeces
-%         q = discretize(abs(b),pFunc.intervals);
-%         ind = abs(b)<eps;
-%         %Stop if new multiindex is the same as previous
-%         if ~any(q-qOld) && ~any(ind-indOld)
-%             break;
-%         end
-%         qOld = q;
-%         indOld = ind;
-%         %Calculate diagonal of regulariser matrix
-%         d = lambda*(alpha*(pFunc.A(q)-1)+1);
-%         %Remove too small coefficients
-%         A = M;
-%         RR = R;
-%         A(ind,:) = 0;
-%         A(:,ind) = 0;
-%         d(ind) = 1;
-%         RR(ind) = 0;
-%         %Solve new SLAE
-%         b = (A+diag(d))\RR;
-%     end
-% end
-
-function potentialFunction = definePotentialFunction( x, number_of_intervals, potential_function_handle, delta )
+function potentialFunction = definePotentialFunction( x,...
+    number_of_intervals, potential_function_handle, delta )
 %definePotentialFunction defines "uniform in square" intervals for trimming
 %threshold x and specified number_of_intervals.
 %   x is upper boundary of the interval last but one.
