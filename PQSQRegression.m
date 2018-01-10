@@ -94,10 +94,10 @@ function [b, intercept] = PQSQRegression(X, Y, varargin)
         weights = weights(:);
     end
     %Normalise
-    weights = weights'/sum(weights);
+    weights = weights / sum(weights);
     
     %Add column vector of ones to the end of X
-    X = [X,ones(n,1)];
+    X = [X, ones(n, 1)];
     
     
     %Func must be function handler
@@ -107,8 +107,10 @@ function [b, intercept] = PQSQRegression(X, Y, varargin)
     end
     
     %Solve OLS to obtain information for deviations
-    b = (X'*diag(weights)*X)\(X'*diag(weights)*Y);
-    
+    A = X;
+    A = bsxfun(@times, A, weights);
+    b = (A' * X) \ (A' * Y);
+
     %Calculate deviations for OLS
     d = abs(Y-X*b);
     
@@ -156,9 +158,11 @@ function [b, intercept] = PQSQRegression(X, Y, varargin)
             break;
         end
         %Form weights matrix
-        d = weights .* pFunc.A(q);
+        d = weights .* (pFunc.A(q))';
         %Calculate new SLAE and solve it
-        b = (X'*diag(d)*X)\(X'*diag(d)*Y);
+        A = X;
+        A = bsxfun(@times, A, d);
+        b = (A' * X) \ (A' * Y);
     end
     
     %Form output arguments
