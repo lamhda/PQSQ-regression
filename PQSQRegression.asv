@@ -1,7 +1,5 @@
 function [b, intercept] = PQSQRegression(X, Y, varargin)
-%PQSQRegression fits regression model with PQSQ penalty of absolute 
-%deviations.
-%
+%PQSQRegression fits regression model with PQSQ approximation for lasso regression.
 %Syntax
 %   [b, intercept] = PQSQRegression(X, Y)
 %   [b, intercept] = PQSQRegression(X, Y, Name, Value)
