@@ -1,4 +1,4 @@
-function drawPlot( B, lims, spec )
+function drawPlot( B, lims, spec, width )
 %drawPlot draw line y=b(1)+x*B(2) in axis with limits 'lims' by line
 %specification 'spec'.
     
@@ -29,6 +29,10 @@ function drawPlot( B, lims, spec )
         end
     end
     % Draw line
-    plot([x1, x2], [y1, y2], spec);
+    if nargin < 4
+        plot([x1, x2], [y1, y2], spec);
+    else
+        plot([x1, x2], [y1, y2], spec, 'LineWidth', width);
+    end
 end
 
