@@ -3,6 +3,11 @@ The method of PQSQ regression is presented. This method allow us quickly and wit
 
 Theory of PQSQ approximation can be found in [wiki](https://github.com/Mirkes/PQSQ-regression/wiki)
 
+## Acknowledgements
+
+Supported by the University of Leicester (UK), Institut Curie (FR), the Ministry of Education and Science of the Russian Federation, project № 14.Y26.31.0022
+
+## Content
 Current MatLab implementation includes several files:
 
 L1 is majorant function for L_1 norm.
